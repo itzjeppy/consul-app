@@ -7,7 +7,7 @@ import TrainingCard from './cards/TrainingCard';
 
 export default function StatsCards() {
   return (
-    <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
+    <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md" >
       <ResumeCard />
       <AttendanceCard />
       <OpportunitiesCard />

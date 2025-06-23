@@ -19,7 +19,7 @@ import {
     const colors: ('blue' | 'green' | 'yellow' | 'purple')[] = ['blue', 'green', 'yellow', 'purple'];
   
     return (
-      <Card withBorder radius="md">
+      <Card withBorder radius="md" shadow='sm'>
         <Title order={3} mb="sm">
           Your Workflow Progress
         </Title>

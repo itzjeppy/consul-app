@@ -11,7 +11,7 @@ import {
   
   export default function ResumeCard() {
     return (
-      <Card radius="md" withBorder>
+      <Card radius="md" withBorder shadow='sm'>
         <Group align="center">
           <IconFile size={24} color="#3b82f6" />
           <Stack gap={0}>

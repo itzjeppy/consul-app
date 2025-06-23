@@ -11,7 +11,7 @@ import {
   
   export default function AttendanceCard() {
     return (
-      <Card radius="md" withBorder>
+      <Card radius="md" withBorder shadow='sm'>
         <Group align="center">
           <IconCalendarCheck size={24} color="#22c55e" />
           <Stack gap={0}>

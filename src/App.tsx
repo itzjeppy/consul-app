@@ -13,7 +13,7 @@ export default function App() {
       <NavBar />
       <Container size="lg" py="xl">
         <Stack gap="xl">
-          <WelcomeBanner userName="Sarah Johnson" />
+          <WelcomeBanner userName="Sujitha Gladies" />
           <StatsCards />
           <WorkflowProgress />
           <ActionItems />

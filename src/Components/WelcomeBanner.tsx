@@ -16,8 +16,9 @@ import {
       <Paper
         radius="md"
         p="lg"
+        shadow="sm"
         style={{
-          background: 'linear-gradient(to right, #5c6ac4, #805ad5)',
+          background: 'linear-gradient(to right,rgb(84, 104, 231),rgb(172, 93, 232))',
           color: 'white',
         }}
       >

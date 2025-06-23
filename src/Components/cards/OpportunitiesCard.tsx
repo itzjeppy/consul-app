@@ -11,7 +11,7 @@ import {
   
   export default function OpportunitiesCard() {
     return (
-      <Card radius="md" withBorder>
+      <Card radius="md" withBorder shadow='sm'>
         <Group align="center">
           <IconBriefcase size={24} color="#eab308" />
           <Stack gap={0}>

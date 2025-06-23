@@ -11,7 +11,7 @@ import {
   
   export default function TrainingCard() {
     return (
-      <Card radius="md" withBorder>
+      <Card radius="md" withBorder shadow='sm'>
         <Group align="center">
           <IconSchool size={24} color="#a855f7" />
           <Stack gap={0}>
