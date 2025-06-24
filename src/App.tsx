@@ -1,25 +1,23 @@
-import { MantineProvider, Container, Stack } from '@mantine/core';
-import ActionItems from './Components/ActionItems';
-import NavBar from './Components/NavBar';
-import QuickActions from './Components/QuickActions';
-import StatsCards from './Components/StatsCards';
-import WelcomeBanner from './Components/WelcomeBanner';
-import WorkflowProgress from './Components/WorkflowProgress';
-
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import {MantineProvider, Container} from '@mantine/core';
+import Dashboard from './Components/Dashboard/Dashboard';
+import NavBar from './Components/Global/NavBar';
+import ProfilePage from './Components/Profile/ProfilePage';
 
 export default function App() {
-  return (
-    <MantineProvider defaultColorScheme="light">
-      <NavBar />
-      <Container size="lg" py="xl">
-        <Stack gap="xl">
-          <WelcomeBanner userName="John Doe" />
-          <StatsCards />
-          <WorkflowProgress />
-          <ActionItems />
-          <QuickActions />
-        </Stack>
-      </Container>
-    </MantineProvider>
-  );
+    return (
+        <MantineProvider defaultColorScheme="light">
+            <Router>
+                <NavBar/>
+                <Container size="lg" py="xl">
+                    <Routes>
+                        <Route path="/"
+                            element={<Dashboard/>}/> {/* Add more routes here if needed */}
+                        <Route path="/profile"
+                            element={<ProfilePage/>}/>
+                    </Routes>
+                </Container>
+            </Router>
+        </MantineProvider>
+    );
 }
