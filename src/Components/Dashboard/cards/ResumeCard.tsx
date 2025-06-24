@@ -1,47 +1,62 @@
 import {
   Card,
-  Group,
+  Title,
   Text,
-  Progress,
   Badge,
+  Progress,
   Button,
+  Group,
   Stack,
 } from '@mantine/core';
 import { IconFile } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ResumeCard() {
+  const navigate = useNavigate();
+
   return (
-    <Card radius="md" withBorder shadow="sm">
-      {/* Top: Icon + Title */}
-      <Group align="center">
-        <IconFile size={24} color="#228be6" />
-        <Stack gap={0}>
-          <Text fw={600}>Resume Status</Text>
-          <Text size="xs" c="dimmed">
-            Last updated 2 weeks ago
+    <Card withBorder radius="md" shadow="sm" p="md">
+      <Stack gap="xs">
+        {/* Header */}
+        <Group gap="xs">
+          <IconFile size={20} color="#228be6" />
+          <div>
+            <Title order={5}>Resume Status</Title>
+            <Text size="xs" c="gray.6">
+              Last updated 2 weeks ago
+            </Text>
+          </div>
+        </Group>
+
+        {/* Status */}
+        <Group justify="space-between" align="center">
+          <Text size="sm">Status</Text>
+          <Badge color="blue" variant="filled" size="sm" radius="sm">
+            PENDING
+          </Badge>
+        </Group>
+
+        {/* Progress bar */}
+        <Progress value={40} color="blue" size="sm" radius="xl" />
+
+        {/* Filler row */}
+        <Group justify="space-between" mt="xs" c="gray.6" fz="sm">
+          <Text size="sm" c="gray.6">
+            ‎ 
           </Text>
-        </Stack>
-      </Group>
+        </Group>
 
-      {/* Status */}
-      <Group justify="space-between" mt="md">
-        <Text size="sm">Status</Text>
-        <Badge color="blue">Pending</Badge>
-      </Group>
-
-      {/* Progress */}
-      <Progress value={40} mt="sm" size="sm" color="blue" radius="md" />
-
-      {/* Metadata Row (filler info like other cards) */}
-      <Group justify="space-between" mt="xs" c="gray.6" fz="sm">
-        <Text>‎ </Text>
-        <Text>‎ </Text>
-      </Group>
-
-      {/* CTA */}
-      <Button fullWidth mt="md" color="blue" radius="md">
-        Update Resume
-      </Button>
+        {/* Button with navigation */}
+        <Button
+          fullWidth
+          color="blue"
+          radius="md"
+          mt="xs"
+          onClick={() => navigate('/upload-resume')}
+        >
+          Update Resume
+        </Button>
+      </Stack>
     </Card>
   );
 }
