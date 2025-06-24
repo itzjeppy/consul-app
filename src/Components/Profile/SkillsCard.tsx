@@ -1,33 +1,20 @@
 import {
-
     Card,
-
     Text,
-
     Group,
-
     Stack,
-
     Rating,
-
     Progress,
-
     rem
-
 } from '@mantine/core';
 
 interface Skill {
-
     name: string;
-
     years: number;
-
     strength: number; // 1 to 5 stars
-
 }
 
 const skills: Skill[] = [
-
     {
         name: 'React',
         years: 3,
@@ -49,7 +36,6 @@ const skills: Skill[] = [
 ];
 
 export default function SkillsCard() {
-
     return (
         <Card withBorder shadow="sm" radius="md">
             <Text fw={600}
@@ -58,7 +44,6 @@ export default function SkillsCard() {
                 Skills
             </Text>
             <Stack gap="sm">
-
                 {
                 skills.map((skill) => (
                     <Group key={
@@ -75,7 +60,6 @@ export default function SkillsCard() {
                                 skill.name
                             }</Text>
                             <Text size="xs" c="gray.6">
-
                                 {
                                 skill.years
                             }
@@ -91,11 +75,8 @@ export default function SkillsCard() {
                             readOnly
                             size="sm"/>
                     </Group>
-
                 ))
             } </Stack>
         </Card>
-
     );
-
 }
