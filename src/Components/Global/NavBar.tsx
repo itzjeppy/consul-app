@@ -13,6 +13,7 @@ import {
   IconMenu2,
 } from '@tabler/icons-react';
 import '@fontsource/baloo-2';
+import { Link } from 'react-router-dom';
 
 export default function NavBar() {
   return (
@@ -28,11 +29,15 @@ export default function NavBar() {
         <Flex justify="space-between" align="center" wrap="nowrap">
           {/* Left - App Title */}
           <Text
+            component={Link}
+            to="/"
             fw={700}
             size="xl"
             style={{
               fontFamily: '"Baloo 2", cursive',
               letterSpacing: rem(-0.5),
+              textDecoration: 'none',
+              color: 'inherit',
             }}
           >
             Consul App
@@ -42,7 +47,29 @@ export default function NavBar() {
           <Group gap="sm">
             {/* Nav Links aligned to right edge */}
             <Group visibleFrom="sm" gap="sm" ml="auto">
-              {['Dashboard', 'Profile', 'Training', 'Opportunities'].map((link) => (
+              <Button
+                component={Link}
+                to="/"
+                variant="subtle"
+                color="gray.2"
+                fw={500}
+                size="xs"
+              >
+                Dashboard
+              </Button>
+              
+              <Button
+                component={Link}
+                to="/profile"
+                variant="subtle"
+                color="gray.2"
+                fw={500}
+                size="xs"
+              >
+                Profile
+              </Button>
+              
+              {['Training', 'Opportunities'].map((link) => (
                 <Button
                   key={link}
                   variant="subtle"
@@ -61,6 +88,8 @@ export default function NavBar() {
             </Button>
 
             <Avatar
+              component={Link}
+              to="/profile"
               size={26}
               radius="xl"
               src="https://api.dicebear.com/7.x/initials/svg?seed=SG"

@@ -12,7 +12,7 @@ export default function App() {
                 <Container size="lg" py="xl">
                     <Routes>
                         <Route path="/"
-                            element={<Dashboard/>}/> {/* Add more routes here if needed */}
+                            element={<Dashboard/>}/>
                         <Route path="/profile"
                             element={<ProfilePage/>}/>
                     </Routes>
