@@ -43,9 +43,7 @@ export default function NavBar() {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}
     >
-      <Container size="lg">
         <Group justify="space-between" align="center" wrap="nowrap">
-          {/* App Title */}
           <Text
             fw={700}
             size="xl"
@@ -55,7 +53,7 @@ export default function NavBar() {
           </Text>
 
           {/* Spacer to push links to right */}
-          <Flex ml="auto" gap="sm" align="center">
+          <Flex gap="sm" align="center" justify="flex-end">
             {/* Nav Links */}
             {navLinks.map((link) => (
               <Button
@@ -82,7 +80,7 @@ export default function NavBar() {
               onClick={toggleTheme}
               title={`Switch to ${colorScheme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+              {colorScheme === 'dark' ? <IconMoon size={18} /> : <IconSun size={18} />}
             </Button>
 
             {/* Avatar */}
@@ -96,7 +94,7 @@ export default function NavBar() {
 
             {/* Auth Button */}
             <Button
-              variant="outline"
+              variant="subtle"
               color="white"
               size="xs"
               onClick={() => navigate('/auth')}
@@ -105,7 +103,6 @@ export default function NavBar() {
             </Button>
           </Flex>
         </Group>
-      </Container>
     </Box>
   );
 }

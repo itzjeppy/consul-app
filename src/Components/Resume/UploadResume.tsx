@@ -7,7 +7,9 @@ import {
   Button,
   Stack,
   Notification,
-  rem,
+  Rating,
+  useMantineTheme,
+  useComputedColorScheme,
 } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import {
@@ -18,10 +20,21 @@ import {
   IconFilePlus,
 } from '@tabler/icons-react';
 
+interface Skill {
+  name: string;
+  rating: number;
+}
+
 export default function UploadResumePage() {
   const [file, setFile] = useState<File | null>(null);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
+  const [skills, setSkills] = useState<Skill[]>([]);
+
+  const theme = useMantineTheme();
+  const  computedColorScheme  = useComputedColorScheme();
+
+  const mockExtractedSkills = ['React', 'TypeScript', 'GraphQL', 'Node.js'];
 
   const handleUpload = () => {
     if (!file) {
@@ -30,15 +43,28 @@ export default function UploadResumePage() {
       return;
     }
 
+    // Simulate file upload + mock backend skill extraction
     setTimeout(() => {
       console.log('Uploaded:', file.name);
+      const extractedSkills: Skill[] = mockExtractedSkills.map((skill) => ({
+        name: skill,
+        rating: 0,
+      }));
+
+      setSkills(extractedSkills);
       setSuccess(true);
       setError(false);
     }, 1000);
   };
 
+  const handleSkillRating = (index: number, value: number) => {
+    const updatedSkills = [...skills];
+    updatedSkills[index].rating = value;
+    setSkills(updatedSkills);
+  };
+
   return (
-    <Card withBorder shadow="md" radius="md" p="lg" maw={600} mx="auto">
+    <Card withBorder shadow="md" radius="md" p="lg" maw={800} mx="auto">
       <Stack gap="md">
         <Title order={3}>Upload Your Resume</Title>
         <Text size="sm" c="dimmed">
@@ -50,27 +76,33 @@ export default function UploadResumePage() {
             setFile(files[0]);
             setError(false);
             setSuccess(false);
+            setSkills([]);
           }}
           onReject={() => {
             setFile(null);
             setError(true);
             setSuccess(false);
+            setSkills([]);
           }}
           maxSize={5 * 1024 ** 2}
           accept={[MIME_TYPES.pdf, MIME_TYPES.doc, MIME_TYPES.docx]}
-          radius="md"
+          radius="xl"
           p="xl"
           styles={{
             root: {
-              borderColor: '#805AD5',
-              borderStyle: 'dashed',
-              backgroundColor: '#f8f9fa',
+              borderColor: theme.colors.indigo[5],
+              borderStyle: "groove",
+              backgroundColor:
+                computedColorScheme === 'dark'
+                  ? theme.colors.dark[6]
+                  : theme.colors.gray[0],
               transition: 'background-color 0.2s ease',
             },
           }}
         >
+          
           <Dropzone.Accept>
-            <Group justify="center" align="center" style={{ minHeight: 120, pointerEvents: 'none' }}>
+            <Group justify="center" align="center" style={{ minHeight: 420, pointerEvents: 'none' }}>
               <IconCheck size={40} color="green" />
               <Text size="sm" ta="center" mt="sm" c="green">
                 Drop your file to upload
@@ -79,7 +111,7 @@ export default function UploadResumePage() {
           </Dropzone.Accept>
 
           <Dropzone.Reject>
-            <Group justify="center" align="center" style={{ minHeight: 120, pointerEvents: 'none' }}>
+            <Group justify="center" align="center" style={{ minHeight: 420, pointerEvents: 'none' }}>
               <IconX size={40} color="red" />
               <Text size="sm" ta="center" mt="sm" c="red">
                 File type not supported or too large
@@ -88,8 +120,8 @@ export default function UploadResumePage() {
           </Dropzone.Reject>
 
           <Dropzone.Idle>
-            <Group justify="center" align="center" style={{ minHeight: 120, pointerEvents: 'none' }}>
-              <IconFilePlus size={40} color="#805AD5" />
+            <Group justify="center" align="center" style={{ minHeight: 400, pointerEvents: 'none' }}>
+              <IconFilePlus size={40} color={theme.colors.indigo[5]} />
               <Text size="sm" ta="center" mt="sm" c="gray.7">
                 Drag & drop or click to select your resume
               </Text>
@@ -134,6 +166,18 @@ export default function UploadResumePage() {
             Upload Resume
           </Button>
         </Group>
+
+        {skills.length > 0 && (
+          <Stack gap="sm" mt="lg">
+            <Title order={4}>Rate Your Skills</Title>
+            {skills.map((skill, i) => (
+              <Group key={skill.name} justify="space-between">
+                <Text>{skill.name}</Text>
+                <Rating value={skill.rating} onChange={(val) => handleSkillRating(i, val)} />
+              </Group>
+            ))}
+          </Stack>
+        )}
       </Stack>
     </Card>
   );
