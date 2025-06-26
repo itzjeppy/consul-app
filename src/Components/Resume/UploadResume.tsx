@@ -10,6 +10,7 @@ import {
   Rating,
   useMantineTheme,
   useComputedColorScheme,
+  Loader,
 } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import {
@@ -28,33 +29,60 @@ interface Skill {
 export default function UploadResumePage() {
   const [file, setFile] = useState<File | null>(null);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | false>(false);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const theme = useMantineTheme();
-  const  computedColorScheme  = useComputedColorScheme();
+  const computedColorScheme = useComputedColorScheme();
 
-  const mockExtractedSkills = ['React', 'TypeScript', 'GraphQL', 'Node.js'];
-
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) {
-      setError(true);
+      setError('Please select a resume file.');
       setSuccess(false);
       return;
     }
+    setLoading(true);
+    setError(false);
+    setSuccess(false);
 
-    // Simulate file upload + mock backend skill extraction
-    setTimeout(() => {
-      console.log('Uploaded:', file.name);
-      const extractedSkills: Skill[] = mockExtractedSkills.map((skill) => ({
-        name: skill,
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
+
+      const response = await fetch('/api/upload-resume', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        setError(err?.error || 'Failed to process resume.');
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      // Assume API returns: { data: { skills: [{ name: string }], history: [...] } }
+      if (!data?.data?.skills) {
+        setError('No skills found in resume.');
+        setLoading(false);
+        return;
+      }
+
+      const extractedSkills: Skill[] = data.data.skills.map((skill: any) => ({
+        name: skill.name || skill,
         rating: 0,
       }));
 
       setSkills(extractedSkills);
       setSuccess(true);
       setError(false);
-    }, 1000);
+    } catch (e: any) {
+      setError('Error uploading resume. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSkillRating = (index: number, value: number) => {
@@ -80,7 +108,7 @@ export default function UploadResumePage() {
           }}
           onReject={() => {
             setFile(null);
-            setError(true);
+            setError('File type not supported or too large');
             setSuccess(false);
             setSkills([]);
           }}
@@ -100,7 +128,7 @@ export default function UploadResumePage() {
             },
           }}
         >
-          
+
           <Dropzone.Accept>
             <Group justify="center" align="center" style={{ minHeight: 200, pointerEvents: 'none' }}>
               <IconCheck size={40} color="green" />
@@ -141,13 +169,15 @@ export default function UploadResumePage() {
           </Group>
         )}
 
-        {success && (
+        {loading && <Loader color="indigo" />}
+
+        {success && !loading && (
           <Notification
             color="green"
             icon={<IconCheck size={18} />}
             onClose={() => setSuccess(false)}
           >
-            Resume uploaded successfully!
+            Resume uploaded and processed successfully!
           </Notification>
         )}
 
@@ -157,12 +187,12 @@ export default function UploadResumePage() {
             icon={<IconX size={18} />}
             onClose={() => setError(false)}
           >
-            Please select a valid file (PDF or DOCX, max 5MB)
+            {error}
           </Notification>
         )}
 
         <Group justify="flex-end">
-          <Button onClick={handleUpload} disabled={!file} color="indigo">
+          <Button onClick={handleUpload} disabled={!file || loading} color="indigo">
             Upload Resume
           </Button>
         </Group>
@@ -181,7 +211,6 @@ export default function UploadResumePage() {
                 color="indigo"
                 onClick={() => {
                   localStorage.setItem('profileSkills', JSON.stringify(skills));
-                  // You can also save certifications here if needed
                   window.location.href = '/profile';
                 }}
               >
