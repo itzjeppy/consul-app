@@ -8,12 +8,12 @@ import WorkflowProgress from './WorkflowProgress';
 export default function Dashboard() {
 
     return (
-<Paper pb="lg">
-  <Stack gap="xl">
+<Paper mb="xl">
+  <Stack gap="lg">
     <WelcomeBanner userName="Mike Rophone" />
+    <ActionItems />
     <StatsCards />
     <WorkflowProgress />
-    <ActionItems />
     <QuickActions />
   </Stack>
 </Paper>
