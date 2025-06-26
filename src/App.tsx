@@ -9,6 +9,7 @@ import OpportunitiesPage from './Components/Opportunities/OpportunitiesPage';
 import ApplicationsPage from './Components/Opportunities/ApplicationsPage';
 import { TrainingsPage } from './Components/Trainings/TrainingsPage';
 import { MyTrainingsPage } from './Components/Trainings/MyTrainingsPage';
+import ProfileEditPage from './Components/Profile/EditProfile';
 
 export default function App() {
   return (
@@ -18,7 +19,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePage />}/>
+          <Route path="/profile/edit" element={<ProfileEditPage/>}/>
           <Route path="/upload-resume" element={<UploadResumePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/trainings" element={<TrainingsPage/>}/>

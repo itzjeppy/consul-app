@@ -7,13 +7,17 @@ import {
   Divider,
   Grid,
   Box,
+  ActionIcon,
 } from '@mantine/core';
 import {
   IconIdBadge2,
   IconPhone,
   IconMail,
   IconMapPin,
+  IconEdit,
 } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import ActionItems from '../Dashboard/ActionItems';
 
 interface PersonalInfoProps {
   name: string;
@@ -41,6 +45,7 @@ export default function PersonalInfo({
   currentRole,
 }: PersonalInfoProps) {
   const avatarSeed = getInitialsSeed(name);
+  const navigate = useNavigate();
 
   return (
     <Card withBorder shadow="sm" radius="md" p="md">
@@ -56,9 +61,12 @@ export default function PersonalInfo({
         {/* Info Stack */}
         <Stack gap="xs" style={{ flex: 1 }}>
           <Box>
-            <Text fw={700} size="lg">
+            <Group gap="xs" align="center">
+            <Text fw={700} size="xl">
               {name}
             </Text>
+            <ActionIcon variant="subtle" onClick={() => navigate("./edit")}><IconEdit/></ActionIcon>
+            </Group>
             <Text size="sm" c="gray.6">
               {currentRole}
             </Text>

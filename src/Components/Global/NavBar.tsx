@@ -19,7 +19,7 @@ export default function NavBar() {
   const navLinks = [
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Profile', path: '/profile' },
-    { label: 'Training', path: '/training' },
+    { label: 'Training', path: '/trainings' },
     { label: 'Opportunities', path: '/opportunities' },
   ];
 
