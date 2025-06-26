@@ -5,6 +5,10 @@ import Dashboard from './Components/Dashboard/Dashboard';
 import ProfilePage from './Components/Profile/ProfilePage';
 import UploadResumePage from './Components/Resume/UploadResume';
 import AuthPage from './Components/Auth/AuthPage';
+import OpportunitiesPage from './Components/Opportunities/OpportunitiesPage';
+import ApplicationsPage from './Components/Opportunities/ApplicationsPage';
+import { TrainingsPage } from './Components/Trainings/TrainingsPage';
+import { MyTrainingsPage } from './Components/Trainings/MyTrainingsPage';
 
 export default function App() {
   return (
@@ -17,6 +21,10 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/upload-resume" element={<UploadResumePage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/trainings" element={<TrainingsPage/>}/>
+          <Route path ="/mytrainings" element={<MyTrainingsPage/>}/>
+          <Route path="/opportunities" element={<OpportunitiesPage/>}/>
+          <Route path="/applications" element={<ApplicationsPage/>}/>
         </Routes>
       </Container>
     </>

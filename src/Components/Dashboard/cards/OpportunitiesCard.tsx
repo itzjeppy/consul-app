@@ -8,8 +8,13 @@ import {
     Stack,
   } from '@mantine/core';
   import { IconBriefcase } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
   
   export default function OpportunitiesCard() {
+
+    const navigate = useNavigate();
+
+
     return (
       <Card radius="md" withBorder shadow='sm'>
         <Group align="center">
@@ -34,7 +39,7 @@ import {
           <Text>Applied: 9</Text>
         </Group>
   
-        <Button fullWidth mt="md" color="yellow" radius="md">
+        <Button fullWidth mt="md" color="yellow" radius="md" onClick={() => navigate("/opportunities")}>
           View Opportunities
         </Button>
       </Card>

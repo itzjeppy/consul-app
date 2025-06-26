@@ -8,8 +8,11 @@ import {
     Stack,
   } from '@mantine/core';
   import { IconSchool } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
   
   export default function TrainingCard() {
+
+    const navigate = useNavigate();
     return (
       <Card radius="md" withBorder shadow='sm'>
         <Group align="center">
@@ -34,7 +37,7 @@ import {
           <Text>Due: 5 days</Text>
         </Group>
   
-        <Button fullWidth mt="md" color="purple" radius="md">
+        <Button fullWidth mt="md" color="purple" radius="md" onClick={() => navigate("/trainings")}>
           Continue Training
         </Button>
       </Card>

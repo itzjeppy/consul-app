@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console | Consultant Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                z-index: 50;
+                height: 100vh;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-indigo-800 text-white w-64 flex-shrink-0">
+            <div class="p-4 flex items-center space-x-2 border-b border-indigo-700">
+                <i class="fas fa-user-shield text-2xl"></i>
+                <h1 class="text-xl font-bold">Admin Console</h1>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" class="flex items-center space-x-2 p-2 rounded bg-indigo-700">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-2 p-2 rounded hover:bg-indigo-700">
+                            <i class="fas fa-users"></i>
+                            <span>Consultants</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-2 p-2 rounded hover:bg-indigo-700">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Performance Metrics</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-2 p-2 rounded hover:bg-indigo-700">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-2 p-2 rounded hover:bg-indigo-700">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="absolute bottom-0 w-full p-4 border-t border-indigo-700">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">Admin User</p>
+                        <p class="text-xs text-indigo-300">Super Admin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <button id="sidebarToggle" class="md:hidden text-gray-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold text-gray-800">Consultant Management Dashboard</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button class="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <!-- Dashboard Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="dashboard-card bg-white rounded-lg shadow p-6 transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Active Consultants</p>
+                                <h3 class="text-2xl font-bold text-gray-800">142</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-green-600 mt-2"><span class="font-semibold">+5.2%</span> from last month</p>
+                    </div>
+                    <div class="dashboard-card bg-white rounded-lg shadow p-6 transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Pending Requests</p>
+                                <h3 class="text-2xl font-bold text-gray-800">23</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-yellow-600 mt-2"><span class="font-semibold">+2</span> new today</p>
+                    </div>
+                    <div class="dashboard-card bg-white rounded-lg shadow p-6 transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Avg. Response Time</p>
+                                <h3 class="text-2xl font-bold text-gray-800">2.4s</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-stopwatch"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-blue-600 mt-2"><span class="font-semibold">-0.3s</span> from last week</p>
+                    </div>
+                    <div class="dashboard-card bg-white rounded-lg shadow p-6 transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Error Rate</p>
+                                <h3 class="text-2xl font-bold text-gray-800">1.2%</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-red-600 mt-2"><span class="font-semibold">+0.4%</span> from yesterday</p>
+                    </div>
+                </div>
+
+                <!-- Consultant Search and Filters -->
+                <div class="bg-white rounded-lg shadow mb-6">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800">Consultant Search & Filters</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Skill</label>
+                                <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option>All Skills</option>
+                                    <option>Technical Support</option>
+                                    <option>Customer Service</option>
+                                    <option>Sales</option>
+                                    <option>IT Specialist</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                                <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option>All Departments</option>
+                                    <option>Support</option>
+                                    <option>Sales</option>
+                                    <option>Operations</option>
+                                    <option>IT</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option>All Statuses</option>
+                                    <option>Active</option>
+                                    <option>Inactive</option>
+                                    <option>Training</option>
+                                    <option>On Leave</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300">
+                                    <i class="fas fa-filter mr-2"></i> Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">CN-1001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                    <i class="fas fa-user text-indigo-600"></i>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">Alex Johnson</div>
+                                                    <div class="text-sm text-gray-500">alex.johnson@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Technical Support</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex flex-wrap gap-1">
+                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">Networking</span>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">Troubleshooting</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></button>
+                                            <button class="text-yellow-600 hover:text-yellow-900"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">CN-1002</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                    <i class="fas fa-user text-indigo-600"></i>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">Sarah Williams</div>
+                                                    <div class="text-sm text-gray-500">sarah.w@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Customer Service</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex flex-wrap gap-1">
+                                                <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">Communication</span>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">Problem Solving</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Training</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></button>
+                                            <button class="text-yellow-600 hover:text-yellow-900"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">CN-1003</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                    <i class="fas fa-user text-indigo-600"></i>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">Michael Brown</div>
+                                                    <div class="text-sm text-gray-500">michael.b@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sales</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex flex-wrap gap-1">
+                                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Negotiation</span>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">CRM</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></button>
+                                            <button class="text-yellow-600 hover:text-yellow-900"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                            <div class="flex-1 flex justify-between sm:hidden">
+                                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</button>
+                                <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</button>
+                            </div>
+                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-700">
+                                        Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span class="font-medium">142</span> results
+                                    </p>
+                                </div>
+                                <div>
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">Previous</span>
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">1</button>
+                                        <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">2</button>
+                                        <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">3</button>
+                                        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>
+                                        <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">8</button>
+                                        <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">Next</span>
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Queue Management -->
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800">Agentic Framework Queues</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="chart-container">
+                                <canvas id="queueChart"></canvas>
+                            </div>
+                            <div class="mt-4 grid grid-cols-2 gap-4">
+                                <div class="p-3 border rounded-lg">
+                                    <p class="text-sm text-gray-500">Avg. Queue Time</p>
+                                    <p class="text-xl font-semibold">3.2 min</p>
+                                </div>
+                                <div class="p-3 border rounded-lg">
+                                    <p class="text-sm text-gray-500">Max Queue Time</p>
+                                    <p class="text-xl font-semibold">8.7 min</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latency & Error Rates -->
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800">System Performance</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                            <div class="mt-4 grid grid-cols-2 gap-4">
+                                <div class="p-3 border rounded-lg">
+                                    <p class="text-sm text-gray-500">Avg. Latency</p>
+                                    <p class="text-xl font-semibold">1.8s</p>
+                                </div>
+                                <div class="p-3 border rounded-lg">
+                                    <p class="text-sm text-gray-500">Error Rate</p>
+                                    <p class="text-xl font-semibold">1.2%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Generation -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800">Report Generation</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Report Type</label>
+                                <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option>Consultant Status</option>
+                                    <option>Department Performance</option>
+                                    <option>Queue Analysis</option>
+                                    <option>Error Logs</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Time Range</label>
+                                <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option>Last 7 Days</option>
+                                    <option>Last 30 Days</option>
+                                    <option>Last Quarter</option>
+                                    <option>Custom Range</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Format</label>
+                                <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option>PDF</option>
+                                    <option>Excel</option>
+                                    <option>CSV</option>
+                                    <option>HTML</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                                <i class="fas fa-eye mr-2"></i> Preview
+                            </button>
+                            <button class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300">
+                                <i class="fas fa-download mr-2"></i> Generate Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Toggle sidebar on mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Queue Chart
+            const queueCtx = document.getElementById('queueChart').getContext('2d');
+            const queueChart = new Chart(queueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Support', 'Sales', 'Operations', 'IT', 'HR', 'Finance'],
+                    datasets: [{
+                        label: 'Queue Length',
+                        data: [12, 19, 8, 5, 2, 3],
+                        backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Performance Chart
+            const perfCtx = document.getElementById('performanceChart').getContext('2d');
+            const perfChart = new Chart(perfCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Latency (s)',
+                        data: [2.5, 2.3, 2.1, 1.9, 1.8, 1.7],
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Error Rate (%)',
+                        data: [2.1, 1.8, 1.6, 1.4, 1.3, 1.2],
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
