@@ -106,7 +106,7 @@ import {
            <Group justify="space-between">
             <Group gap="xs">
              <IconBriefcase size={20} />
-             <Title order={5}>{job.title}</Title>
+             <Title order={4}>{job.title}</Title>
             </Group>
             <Badge color="yellow" variant="light">
              {job.level}
