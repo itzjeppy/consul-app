@@ -8,8 +8,10 @@ import {
     Stack,
   } from '@mantine/core';
   import { IconCalendarCheck } from '@tabler/icons-react';
+  import { useNavigate } from 'react-router-dom';
   
   export default function AttendanceCard() {
+    const navigate = useNavigate();
     return (
       <Card radius="md" withBorder shadow='sm'>
         <Group align="center">
@@ -34,7 +36,7 @@ import {
           <Text>Missed: 0</Text>
         </Group>
   
-        <Button fullWidth mt="md" color="green" radius="md">
+        <Button fullWidth mt="md" color="green" radius="md" onClick={() => navigate('/attendance-report')}>
           View Report
         </Button>
       </Card>

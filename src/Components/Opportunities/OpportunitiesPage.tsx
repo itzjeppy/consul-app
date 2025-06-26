@@ -11,6 +11,8 @@ import {
      ActionIcon,
      TextInput,
      Select,
+     useMantineTheme,
+     useComputedColorScheme,
     } from '@mantine/core';
     import {
      IconBriefcase,
@@ -24,33 +26,42 @@ import {
     
     const dummyOpportunities = [
      {
-      title: 'Frontend Developer',
-      company: 'TechCorp',
-      description: 'Work with React and TypeScript to build modern UIs.',
+      id: 1,
+      name: 'Frontend Developer',
+      skills_expected: 'React, TypeScript',
+      years_of_experience_required: 2,
+      deadline: '2025-07-10',
       level: 'Intermediate',
      },
      {
-      title: 'Backend Developer',
-      company: 'ServerBase',
-      description: 'Develop scalable APIs with Node.js and Express.',
+      id: 2,
+      name: 'Backend Developer',
+      skills_expected: 'Node.js, Express',
+      years_of_experience_required: 3,
+      deadline: '2025-07-15',
       level: 'Advanced',
      },
      {
-      title: 'AI Research Intern',
-      company: 'MindLabs',
-      description: 'Contribute to ML model training and analysis.',
+      id: 3,
+      name: 'AI Research Intern',
+      skills_expected: 'Python, ML',
+      years_of_experience_required: 0,
+      deadline: '2025-07-20',
       level: 'Beginner',
      },
     ];
     
     export default function OpportunitiesPage() {
+     const theme = useMantineTheme();
+     const colorScheme = useComputedColorScheme('light');
+     const isDark = colorScheme === 'dark';
      const navigate = useNavigate();
      const [search, setSearch] = useState('');
      const [filter, setFilter] = useState('');
     
      const filteredOpportunities = dummyOpportunities.filter((job) =>
-      (job.title.toLowerCase().includes(search.toLowerCase()) ||
-      job.company.toLowerCase().includes(search.toLowerCase())) &&
+      (job.name.toLowerCase().includes(search.toLowerCase()) ||
+      job.skills_expected.toLowerCase().includes(search.toLowerCase())) &&
       (filter === '' || job.level === filter)
      );
     
@@ -77,7 +88,7 @@ import {
        <Group mb="lg" gap="md" wrap="wrap">
         <TextInput
          leftSection={<IconSearch size={16} />}
-         placeholder="Search roles or companies..."
+         placeholder="Search roles or skills..."
          value={search}
          onChange={(e) => setSearch(e.currentTarget.value)}
         />
@@ -93,33 +104,64 @@ import {
     
        {/* Opportunity Cards */}
        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-        {filteredOpportunities.map((job, index) => (
+        {filteredOpportunities.map((job) => (
          <Card
-          key={index}
+          key={job.id}
           shadow="md"
           radius="md"
           withBorder
           p="lg"
-          style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 220 }}
+          style={{
+           display: 'flex',
+           flexDirection: 'column',
+           justifyContent: 'space-between',
+           minHeight: 240,
+           background: isDark ? '#2d3142' : '#fff',
+           borderColor: isDark ? theme.colors.dark[4] : theme.colors.gray[3],
+          }}
          >
           <Stack gap="xs">
-           <Group justify="space-between">
-            <Group gap="xs">
-             <IconBriefcase size={20} />
-             <Title order={4}>{job.title}</Title>
+           <Group justify="space-between" align="flex-start">
+            <Group gap={8} align="center" style={{ width: '100%' }}>
+             <IconBriefcase size={22} color={theme.colors.yellow[6]} />
+             <Title order={4} style={{ fontWeight: 700, fontSize: 20, color: isDark ? theme.white : '#222', flex: 1 }}>
+              {job.name}
+             </Title>
+             <Badge
+              color="yellow"
+              size="md"
+              style={{
+                fontWeight: 700,
+                fontSize: 13,
+                color: isDark ? theme.colors.dark[7] : '#222',
+                background: isDark ? theme.colors.yellow[6] : '#fef9c3',
+                borderRadius: 999,
+                padding: '4px 16px',
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                marginLeft: 8,
+                height: 28,
+                alignSelf: 'center',
+              }}
+             >
+              {job.level}
+             </Badge>
             </Group>
-            <Badge color="yellow" variant="light">
-             {job.level}
-            </Badge>
            </Group>
-    
-           <Text size="sm" c="dimmed">
-            {job.company}
-           </Text>
-           <Text size="sm">{job.description}</Text>
+           <Group gap={8} align="center" mt={4} mb={2}>
+            <Badge color="yellow" variant="light" size="sm" style={{ color: isDark ? theme.colors.dark[7] : '#222', background: isDark ? theme.colors.yellow[6] : '#fef9c3' }}>Skills</Badge>
+            <Text size="sm" style={{ color: isDark ? theme.white : '#222', fontWeight: 500 }}>{job.skills_expected}</Text>
+           </Group>
+           <Group gap={8} align="center" mb={2}>
+            <Badge color="yellow" variant="light" size="sm" style={{ color: isDark ? theme.colors.dark[7] : '#222', background: isDark ? theme.colors.yellow[6] : '#fef9c3' }}>Experience</Badge>
+            <Text size="sm" style={{ color: isDark ? theme.white : '#222' }}>{job.years_of_experience_required} year{job.years_of_experience_required !== 1 ? 's' : ''}</Text>
+           </Group>
+           <Group gap={8} align="center">
+            <Badge color="yellow" variant="light" size="sm" style={{ color: isDark ? theme.colors.dark[7] : '#222', background: isDark ? theme.colors.yellow[6] : '#fef9c3' }}>Deadline</Badge>
+            <Text size="sm" style={{ color: isDark ? theme.white : '#222' }}>{job.deadline}</Text>
+           </Group>
           </Stack>
-    
-          <Button mt="md" fullWidth color="yellow" variant="filled">
+          <Button mt="md" fullWidth color="yellow.5" variant="filled" radius="md" size="md" style={{ fontWeight: 600, color: isDark ? theme.colors.dark[7] : '#222', background: isDark ? theme.colors.yellow[6] : undefined }}>
            Apply Now
           </Button>
          </Card>

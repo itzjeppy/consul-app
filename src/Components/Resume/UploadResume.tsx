@@ -102,7 +102,7 @@ export default function UploadResumePage() {
         >
           
           <Dropzone.Accept>
-            <Group justify="center" align="center" style={{ minHeight: 420, pointerEvents: 'none' }}>
+            <Group justify="center" align="center" style={{ minHeight: 200, pointerEvents: 'none' }}>
               <IconCheck size={40} color="green" />
               <Text size="sm" ta="center" mt="sm" c="green">
                 Drop your file to upload
@@ -111,7 +111,7 @@ export default function UploadResumePage() {
           </Dropzone.Accept>
 
           <Dropzone.Reject>
-            <Group justify="center" align="center" style={{ minHeight: 420, pointerEvents: 'none' }}>
+            <Group justify="center" align="center" style={{ minHeight: 200, pointerEvents: 'none' }}>
               <IconX size={40} color="red" />
               <Text size="sm" ta="center" mt="sm" c="red">
                 File type not supported or too large
@@ -120,7 +120,7 @@ export default function UploadResumePage() {
           </Dropzone.Reject>
 
           <Dropzone.Idle>
-            <Group justify="center" align="center" style={{ minHeight: 400, pointerEvents: 'none' }}>
+            <Group justify="center" align="center" style={{ minHeight: 200, pointerEvents: 'none' }}>
               <IconFilePlus size={40} color={theme.colors.indigo[5]} />
               <Text size="sm" ta="center" mt="sm" c="gray.7">
                 Drag & drop or click to select your resume
@@ -176,6 +176,18 @@ export default function UploadResumePage() {
                 <Rating value={skill.rating} onChange={(val) => handleSkillRating(i, val)} />
               </Group>
             ))}
+            <Group justify="flex-end" mt="md">
+              <Button
+                color="indigo"
+                onClick={() => {
+                  localStorage.setItem('profileSkills', JSON.stringify(skills));
+                  // You can also save certifications here if needed
+                  window.location.href = '/profile';
+                }}
+              >
+                Submit
+              </Button>
+            </Group>
           </Stack>
         )}
       </Stack>

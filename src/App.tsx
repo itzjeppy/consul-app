@@ -10,6 +10,7 @@ import ApplicationsPage from './Components/Opportunities/ApplicationsPage';
 import { TrainingsPage } from './Components/Trainings/TrainingsPage';
 import { MyTrainingsPage } from './Components/Trainings/MyTrainingsPage';
 import ProfileEditPage from './Components/Profile/EditProfile';
+import AttendanceReport from './Components/Attendance/AttendanceReport';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path ="/mytrainings" element={<MyTrainingsPage/>}/>
           <Route path="/opportunities" element={<OpportunitiesPage/>}/>
           <Route path="/applications" element={<ApplicationsPage/>}/>
+          <Route path="/attendance-report" element={<AttendanceReport />} />
         </Routes>
       </Container>
     </>
