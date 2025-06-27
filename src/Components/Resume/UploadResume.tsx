@@ -22,6 +22,8 @@ import {
   IconFilePlus,
 } from '@tabler/icons-react';
 
+const BACKEND_URL = 'http://127.0.0.1:5000';
+
 interface Skill {
   technologies_known: string;
   years_of_experience: number;
@@ -69,7 +71,7 @@ export default function UploadResumePage() {
       const formData = new FormData();
       formData.append('resume', file);
 
-      const response = await fetch('/api/upload-resume', {
+      const response = await fetch(`${BACKEND_URL}/api/upload-resume`, {
         method: 'POST',
         body: formData,
       });
@@ -91,7 +93,7 @@ export default function UploadResumePage() {
       setSkills(data.data.skills || []);
       setCertifications(data.data.certifications || []);
       setProfessional(data.data.professional || null);
-      setRawJson(data.data); // Save the raw JSON for display
+      setRawJson(data.data);
       setSuccess(true);
       setError(false);
     } catch (e: any) {
@@ -106,7 +108,7 @@ export default function UploadResumePage() {
       <Stack gap="md">
         <Title order={3}>Upload Your Resume</Title>
         <Text size="sm" c="dimmed">
-          Drag and drop your resume here, or click to select a file. Accepted formats: PDF, DOCX (max 5MB).
+          Drag and drop your resume here, or click to select a file. Accepted formats: PDF (max 5MB).
         </Text>
 
         <Dropzone
@@ -129,7 +131,7 @@ export default function UploadResumePage() {
             setRawJson(null);
           }}
           maxSize={5 * 1024 ** 2}
-          accept={[MIME_TYPES.pdf, MIME_TYPES.doc, MIME_TYPES.docx]}
+          accept={[MIME_TYPES.pdf]}
           radius="xl"
           p="xl"
           styles={{
@@ -223,8 +225,47 @@ export default function UploadResumePage() {
           </Paper>
         )}
 
-        {/* You can also keep your pretty display below if desired */}
-        {/* ... */}
+        {/* Pretty display */}
+        {skills.length > 0 && (
+          <Stack gap="sm" mt="lg">
+            <Title order={4}>Extracted Skills</Title>
+            {skills.map((skill, i) => (
+              <Group key={skill.technologies_known + i} justify="space-between">
+                <Text>
+                  {skill.technologies_known} ({skill.years_of_experience} yrs)
+                </Text>
+                <Rating value={skill.strength_of_skill} readOnly count={10} />
+              </Group>
+            ))}
+          </Stack>
+        )}
+
+        {certifications.length > 0 && (
+          <Stack gap="sm" mt="lg">
+            <Title order={4}>Certifications</Title>
+            {certifications.map((cert, i) => (
+              <Group key={cert.certification_name + i} justify="space-between">
+                <Text>
+                  {cert.certification_name}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Issued: {cert.issued_date} | Valid till: {cert.valid_till || 'N/A'}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+        )}
+
+        {professional && (
+          <Stack gap="sm" mt="lg">
+            <Title order={4}>Professional Details</Title>
+            <Text>Organization: {professional.last_worked_organization || 'N/A'}</Text>
+            <Text>Role: {professional.recent_role || 'N/A'}</Text>
+            <Text>Project: {professional.recent_project || 'N/A'}</Text>
+            <Text>Start Date: {professional.recent_start_date || 'N/A'}</Text>
+            <Text>Release Date: {professional.recent_project_release_date || 'N/A'}</Text>
+          </Stack>
+        )}
       </Stack>
     </Card>
   );

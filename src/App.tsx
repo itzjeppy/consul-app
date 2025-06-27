@@ -11,14 +11,8 @@ import { TrainingsPage } from './Components/Trainings/TrainingsPage';
 import { MyTrainingsPage } from './Components/Trainings/MyTrainingsPage';
 import ProfileEditPage from './Components/Profile/EditProfile';
 import AttendanceReport from './Components/Attendance/AttendanceReport';
-import express from 'express';
-import resumeRouter from './Routes/Resume';
 
 export default function App() {
-
-  const app = express();
-
-app.use('/api', resumeRouter);
   return (
     <>
       <NavBar />
