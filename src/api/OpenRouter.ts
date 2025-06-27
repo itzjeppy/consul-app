@@ -19,3 +19,4 @@ export async function openRouterChat(prompt: string, model = "openai/gpt-3.5-tur
   );
   return response.data;
 }
+
