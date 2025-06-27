@@ -11,10 +11,11 @@ import {
   useMantineTheme,
   useComputedColorScheme,
   Loader,
+  Paper,
+  Code,
 } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import {
-  IconUpload,
   IconCheck,
   IconX,
   IconFile,
@@ -22,8 +23,23 @@ import {
 } from '@tabler/icons-react';
 
 interface Skill {
-  name: string;
-  rating: number;
+  technologies_known: string;
+  years_of_experience: number;
+  strength_of_skill: number;
+}
+
+interface Certification {
+  certification_name: string;
+  issued_date: string;
+  valid_till: string | null;
+}
+
+interface Professional {
+  last_worked_organization: string | null;
+  recent_role: string | null;
+  recent_project: string | null;
+  recent_start_date: string | null;
+  recent_project_release_date: string | null;
 }
 
 export default function UploadResumePage() {
@@ -31,7 +47,10 @@ export default function UploadResumePage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | false>(false);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [professional, setProfessional] = useState<Professional | null>(null);
   const [loading, setLoading] = useState(false);
+  const [rawJson, setRawJson] = useState<any>(null);
 
   const theme = useMantineTheme();
   const computedColorScheme = useComputedColorScheme();
@@ -63,19 +82,16 @@ export default function UploadResumePage() {
       }
 
       const data = await response.json();
-      // Assume API returns: { data: { skills: [{ name: string }], history: [...] } }
       if (!data?.data?.skills) {
         setError('No skills found in resume.');
         setLoading(false);
         return;
       }
 
-      const extractedSkills: Skill[] = data.data.skills.map((skill: any) => ({
-        name: skill.name || skill,
-        rating: 0,
-      }));
-
-      setSkills(extractedSkills);
+      setSkills(data.data.skills || []);
+      setCertifications(data.data.certifications || []);
+      setProfessional(data.data.professional || null);
+      setRawJson(data.data); // Save the raw JSON for display
       setSuccess(true);
       setError(false);
     } catch (e: any) {
@@ -83,12 +99,6 @@ export default function UploadResumePage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSkillRating = (index: number, value: number) => {
-    const updatedSkills = [...skills];
-    updatedSkills[index].rating = value;
-    setSkills(updatedSkills);
   };
 
   return (
@@ -105,12 +115,18 @@ export default function UploadResumePage() {
             setError(false);
             setSuccess(false);
             setSkills([]);
+            setCertifications([]);
+            setProfessional(null);
+            setRawJson(null);
           }}
           onReject={() => {
             setFile(null);
             setError('File type not supported or too large');
             setSuccess(false);
             setSkills([]);
+            setCertifications([]);
+            setProfessional(null);
+            setRawJson(null);
           }}
           maxSize={5 * 1024 ** 2}
           accept={[MIME_TYPES.pdf, MIME_TYPES.doc, MIME_TYPES.docx]}
@@ -197,28 +213,18 @@ export default function UploadResumePage() {
           </Button>
         </Group>
 
-        {skills.length > 0 && (
-          <Stack gap="sm" mt="lg">
-            <Title order={4}>Rate Your Skills</Title>
-            {skills.map((skill, i) => (
-              <Group key={skill.name} justify="space-between">
-                <Text>{skill.name}</Text>
-                <Rating value={skill.rating} onChange={(val) => handleSkillRating(i, val)} />
-              </Group>
-            ))}
-            <Group justify="flex-end" mt="md">
-              <Button
-                color="indigo"
-                onClick={() => {
-                  localStorage.setItem('profileSkills', JSON.stringify(skills));
-                  window.location.href = '/profile';
-                }}
-              >
-                Submit
-              </Button>
-            </Group>
-          </Stack>
+        {/* RAW JSON OUTPUT */}
+        {rawJson && (
+          <Paper shadow="xs" p="sm" withBorder mt="md">
+            <Title order={5} mb={5}>Extracted JSON</Title>
+            <Code block style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: 13, background: "inherit" }}>
+              {JSON.stringify(rawJson, null, 2)}
+            </Code>
+          </Paper>
         )}
+
+        {/* You can also keep your pretty display below if desired */}
+        {/* ... */}
       </Stack>
     </Card>
   );
