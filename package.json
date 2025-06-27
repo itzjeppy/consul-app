@@ -26,6 +26,7 @@
         "embla-carousel": "^8.5.2",
         "embla-carousel-autoplay": "^8.5.2",
         "embla-carousel-react": "^8.5.2",
+        "mammoth": "^1.9.1",
         "multer": "^2.0.1",
         "pdf-parse": "^1.1.1",
         "react": "18.2.0",
