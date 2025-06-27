@@ -11,6 +11,19 @@ import { TrainingsPage } from './Components/Trainings/TrainingsPage';
 import { MyTrainingsPage } from './Components/Trainings/MyTrainingsPage';
 import ProfileEditPage from './Components/Profile/EditProfile';
 import AttendanceReport from './Components/Attendance/AttendanceReport';
+import React from 'react';
+
+// Simple auth check (replace with real auth in production)
+function isAuthenticated() {
+  return localStorage.getItem('isLoggedIn') === 'true';
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  if (!isAuthenticated()) {
+    return <Navigate to="/auth?tab=signup" replace />;
+  }
+  return <>{children}</>;
+}
 
 export default function App() {
   return (
@@ -18,17 +31,85 @@ export default function App() {
       <NavBar />
       <Container size="lg" pt={80}>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<ProfilePage />}/>
-          <Route path="/profile/edit" element={<ProfileEditPage/>}/>
-          <Route path="/upload-resume" element={<UploadResumePage />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/trainings" element={<TrainingsPage/>}/>
-          <Route path ="/mytrainings" element={<MyTrainingsPage/>}/>
-          <Route path="/opportunities" element={<OpportunitiesPage/>}/>
-          <Route path="/applications" element={<ApplicationsPage/>}/>
-          <Route path="/attendance-report" element={<AttendanceReport />} />
+          <Route
+            path="/"
+            element={
+              isAuthenticated() ? <Navigate to="/dashboard" /> : <Navigate to="/auth?tab=signup" />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute>
+                <ProfileEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/upload-resume"
+            element={
+              <ProtectedRoute>
+                <UploadResumePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trainings"
+            element={
+              <ProtectedRoute>
+                <TrainingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mytrainings"
+            element={
+              <ProtectedRoute>
+                <MyTrainingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/opportunities"
+            element={
+              <ProtectedRoute>
+                <OpportunitiesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/attendance-report"
+            element={
+              <ProtectedRoute>
+                <AttendanceReport />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Container>
     </>

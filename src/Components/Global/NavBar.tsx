@@ -27,6 +27,9 @@ export default function NavBar() {
     setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
   };
 
+  // Check login status
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
   return (
     <Box
       component="header"
@@ -55,7 +58,7 @@ export default function NavBar() {
           {/* Spacer to push links to right */}
           <Flex gap="sm" align="center" justify="flex-end">
             {/* Nav Links */}
-            {navLinks.map((link) => (
+            {isLoggedIn && navLinks.map((link) => (
               <Button
                 key={link.label}
                 variant="subtle"
@@ -68,9 +71,11 @@ export default function NavBar() {
             ))}
 
             {/* Notification Icon */}
-            <Button variant="subtle" color="white" size="xs">
-              <IconBell size={18} />
-            </Button>
+            {isLoggedIn && (
+              <Button variant="subtle" color="white" size="xs">
+                <IconBell size={18} />
+              </Button>
+            )}
 
             {/* Theme Toggle */}
             <Button
@@ -93,14 +98,28 @@ export default function NavBar() {
             />
 
             {/* Auth Button */}
-            <Button
-              variant="subtle"
-              color="white"
-              size="xs"
-              onClick={() => navigate('/auth')}
-            >
-              Login
-            </Button>
+            {!isLoggedIn ? (
+              <Button
+                variant="subtle"
+                color="white"
+                size="xs"
+                onClick={() => navigate('/auth?tab=signin')}
+              >
+                Sign In / Sign Up
+              </Button>
+            ) : (
+              <Button
+                variant="subtle"
+                color="white"
+                size="xs"
+                onClick={() => {
+                  localStorage.removeItem('isLoggedIn');
+                  window.location.href = '/auth?tab=signin';
+                }}
+              >
+                Sign Out
+              </Button>
+            )}
           </Flex>
         </Group>
     </Box>
