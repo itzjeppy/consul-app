@@ -5,18 +5,13 @@ import CertificationsCard from './CertificationsCard';
 import ProfessionalInfo from './ProfessionalInfo';
 
 export default function ProfilePage() {
+  // Get employeeId from localStorage
+  const empId = localStorage.getItem('employeeId') || '';
   return (
     <Paper pb="lg">
       <Stack gap="xl">
         <Title order={2}>Consultant Profile</Title>
-        <PersonalInfo
-          name="Mike Rophone"
-          empId="2000130001"
-          mobile="+91 98765 43210"
-          email="mike.rophone@example.com"
-          address="123 Main St, New Delhi, India"
-          currentRole="Frontend Consultant"
-        />
+        <PersonalInfo empId={empId} />
         <SkillsCard />
         <CertificationsCard />
         <ProfessionalInfo

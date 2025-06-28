@@ -1,26 +1,11 @@
 import { useState } from 'react';
 import {
-  Card,
-  Title,
-  Text,
-  Group,
-  Button,
-  Stack,
-  Notification,
-  Rating,
-  useMantineTheme,
-  useComputedColorScheme,
-  Loader,
-  Paper,
-  Code,
+  Card, Title, Text, Group, Button, Stack,
+  Notification, Rating, useMantineTheme, useComputedColorScheme,
+  Loader, Paper, Code
 } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
-import {
-  IconCheck,
-  IconX,
-  IconFile,
-  IconFilePlus,
-} from '@tabler/icons-react';
+import { IconCheck, IconX, IconFile, IconFilePlus } from '@tabler/icons-react';
 
 const BACKEND_URL = 'http://127.0.0.1:5000';
 
@@ -63,6 +48,13 @@ export default function UploadResumePage() {
       setSuccess(false);
       return;
     }
+
+    const empId = localStorage.getItem("employeeId");
+    if (!empId) {
+      setError('No empId found in localStorage');
+      return;
+    }
+
     setLoading(true);
     setError(false);
     setSuccess(false);
@@ -73,7 +65,10 @@ export default function UploadResumePage() {
 
       const response = await fetch(`${BACKEND_URL}/api/agent/ResumeExtractor`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'X-Emp-ID': empId
+        },
+        body: formData
       });
 
       if (!response.ok) {
@@ -84,12 +79,6 @@ export default function UploadResumePage() {
       }
 
       const data = await response.json();
-      if (!data?.data?.skills) {
-        setError('No skills found in resume.');
-        setLoading(false);
-        return;
-      }
-
       setSkills(data.data.skills || []);
       setCertifications(data.data.certifications || []);
       setProfessional(data.data.professional || null);
@@ -190,21 +179,13 @@ export default function UploadResumePage() {
         {loading && <Loader color="indigo" />}
 
         {success && !loading && (
-          <Notification
-            color="green"
-            icon={<IconCheck size={18} />}
-            onClose={() => setSuccess(false)}
-          >
+          <Notification color="green" icon={<IconCheck size={18} />} onClose={() => setSuccess(false)}>
             Resume uploaded and processed successfully!
           </Notification>
         )}
 
         {error && (
-          <Notification
-            color="red"
-            icon={<IconX size={18} />}
-            onClose={() => setError(false)}
-          >
+          <Notification color="red" icon={<IconX size={18} />} onClose={() => setError(false)}>
             {error}
           </Notification>
         )}
@@ -215,7 +196,6 @@ export default function UploadResumePage() {
           </Button>
         </Group>
 
-        {/* RAW JSON OUTPUT */}
         {rawJson && (
           <Paper shadow="xs" p="sm" withBorder mt="md">
             <Title order={5} mb={5}>Extracted JSON</Title>
@@ -225,7 +205,6 @@ export default function UploadResumePage() {
           </Paper>
         )}
 
-        {/* Pretty display */}
         {skills.length > 0 && (
           <Stack gap="sm" mt="lg">
             <Title order={4}>Extracted Skills</Title>
@@ -245,9 +224,7 @@ export default function UploadResumePage() {
             <Title order={4}>Certifications</Title>
             {certifications.map((cert, i) => (
               <Group key={cert.certification_name + i} justify="space-between">
-                <Text>
-                  {cert.certification_name}
-                </Text>
+                <Text>{cert.certification_name}</Text>
                 <Text size="xs" c="dimmed">
                   Issued: {cert.issued_date} | Valid till: {cert.valid_till || 'N/A'}
                 </Text>

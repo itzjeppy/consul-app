@@ -1,16 +1,16 @@
 import axios from 'axios';
 
-export async function addConsultant(body:object){
-    const response = await axios.post(
+export async function addConsultant(body: object) {
+  const response = await axios.post(
     'http://127.0.0.1:5000/consultant/addConsultant',
+    body,  // ✅ send body directly
     {
-      data:body,
       headers: {
         'Content-Type': 'application/json',
       },
     }
   );
-  return response.data
+  return response.data;
 }
 
 export async function editConsultant(consultantId:number,body:object){
