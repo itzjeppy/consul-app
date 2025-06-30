@@ -24,8 +24,32 @@ import {
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { getOpportunitiesByIds } from '../../api/opportunity';
+import { getOpportunitiesByIds, getAllOpportunities } from '../../api/opportunity';
+
+const RECOMMENDED_OPPS_KEY = 'recommended_opportunities';
+const RECOMMENDED_OPPS_TS_KEY = 'recommended_opportunities_timestamp';
+const RECOMMENDED_OPPS_TTL_MS = 1000 * 60 * 60 * 12; // 12 hours
+
+async function fetchRecommendedOpportunities(emp_id: string | null): Promise<number[]> {
+  if (!emp_id) return [];
+  try {
+    const aiRes = await fetch('http://127.0.0.1:5000/api/agent/OpportunityMatcher', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Emp-ID': emp_id,
+      },
+      body: JSON.stringify({}),
+    });
+    const aiData = await aiRes.json();
+    if (aiData && Array.isArray(aiData.matches)) {
+      return aiData.matches;
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
 
 export default function OpportunitiesPage() {
   const theme = useMantineTheme();
@@ -42,56 +66,68 @@ export default function OpportunitiesPage() {
   const [error, setError] = useState('');
 
   // Replace with actual emp_id logic (from auth/session)
-  const emp_id = localStorage.getItem('employeeId') || sessionStorage.getItem('employeeId');
+  const emp_id =
+    localStorage.getItem('employeeId') || sessionStorage.getItem('employeeId');
 
-  // Fetch AI-recommended opportunity IDs and then the corresponding opportunities
+  // Fetch and cache AI-recommended opportunity IDs
   useEffect(() => {
-    async function fetchRecommendations() {
+    async function loadRecommendations() {
       setLoading(true);
       setError('');
-      try {
-        // Step 1: Ask the agent for recommended opportunity IDs
-        const aiRes = await axios.post(
-          '/api/agent/opportunity_matcher_agent',
-          {},
-          {
-            headers: {
-              'X-Emp-ID': emp_id,
-            },
-          }
-        );
-        if (aiRes.data && Array.isArray(aiRes.data.matches)) {
-          setAiRecommendedIds(aiRes.data.matches);
-          // Step 2: Fetch opportunity details by IDs
-          if (aiRes.data.matches.length > 0) {
-            const opps = await getOpportunitiesByIds(aiRes.data.matches);
-            setOpportunities(opps);
-          } else {
-            setOpportunities([]);
-          }
-        } else {
-          setError('No recommendations found.');
+
+      // Try to read from localStorage first
+      const cachedIdsStr = localStorage.getItem(RECOMMENDED_OPPS_KEY);
+      const cachedTsStr = localStorage.getItem(RECOMMENDED_OPPS_TS_KEY);
+      const now = Date.now();
+      let useCache = false;
+      let matches: number[] = [];
+
+      if (cachedIdsStr && cachedTsStr) {
+        const cachedIds = JSON.parse(cachedIdsStr);
+        const cachedTs = parseInt(cachedTsStr, 10);
+        if (Array.isArray(cachedIds) && now - cachedTs < RECOMMENDED_OPPS_TTL_MS) {
+          useCache = true;
+          matches = cachedIds;
+        }
+      }
+
+      if (!useCache && emp_id) {
+        matches = await fetchRecommendedOpportunities(emp_id);
+        // Store in localStorage
+        localStorage.setItem(RECOMMENDED_OPPS_KEY, JSON.stringify(matches));
+        localStorage.setItem(RECOMMENDED_OPPS_TS_KEY, now.toString());
+      }
+
+      setAiRecommendedIds(matches);
+
+      // Fetch opportunity details by IDs
+      if (matches.length > 0) {
+        try {
+          const opps = await getOpportunitiesByIds(matches);
+          setOpportunities(opps);
+        } catch (e: any) {
+          setError(
+            e?.message ||
+              'Failed to fetch recommended opportunities details.'
+          );
           setOpportunities([]);
         }
-      } catch (e: any) {
-        setError(
-          e?.response?.data?.error ||
-            'Failed to fetch recommended opportunities.'
-        );
+      } else {
         setOpportunities([]);
       }
+
       setLoading(false);
     }
 
-    fetchRecommendations();
+    loadRecommendations();
   }, [emp_id]);
 
   // Optionally fetch all opportunities for searching/filtering beyond AI recommendations
   useEffect(() => {
     async function fetchAll() {
       try {
-        const res = await axios.get('/opportunity/getAllOpportunities');
-        setAllOpportunities(res.data.opportunities || []);
+        const opportunities = await getAllOpportunities();
+        setAllOpportunities(opportunities || []);
       } catch (e) {
         setAllOpportunities([]);
       }
@@ -103,7 +139,7 @@ export default function OpportunitiesPage() {
   const filteredOpportunities = opportunities.filter((job) =>
     (job.name.toLowerCase().includes(search.toLowerCase()) ||
       job.skills_expected.toLowerCase().includes(search.toLowerCase())) &&
-    (filter === '' || (job.level === filter))
+    (filter === '' || job.level === filter)
   );
 
   return (
