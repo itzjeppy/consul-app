@@ -97,7 +97,7 @@ export default function UploadResumePage() {
       <Stack gap="md">
         <Title order={3}>Upload Your Resume</Title>
         <Text size="sm" c="dimmed">
-          Drag and drop your resume here, or click to select a file. Accepted formats: PDF (max 5MB).
+          Drag and drop your resume here, or click to select a file. Accepted formats: PDF, DOCX (max 5MB).
         </Text>
 
         <Dropzone
@@ -120,7 +120,12 @@ export default function UploadResumePage() {
             setRawJson(null);
           }}
           maxSize={5 * 1024 ** 2}
-          accept={[MIME_TYPES.pdf]}
+          accept={[
+            MIME_TYPES.pdf,
+            MIME_TYPES.docx,
+            // Some browsers may use "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          ]}
           radius="xl"
           p="xl"
           styles={{

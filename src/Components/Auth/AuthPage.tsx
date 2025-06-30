@@ -17,6 +17,7 @@ import {
   Grid,
   Center,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { IconLock, IconId } from '@tabler/icons-react';
 import { addUser, ValidateUser } from '../../api/users';
 import { addConsultant, getConsultantByEmpId } from '../../api/consultant';
@@ -49,7 +50,6 @@ export default function AuthPage() {
   const [signinLoading, setSigninLoading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
   const [signinError, setSigninError] = useState('');
-  const [signupError, setSignupError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [signinId, setSigninId] = useState('');
   const [signinPassword, setSigninPassword] = useState('');
@@ -66,36 +66,54 @@ export default function AuthPage() {
   const paperMaxWidth = activeTab === 'signup' ? 740 : 540;
   const gridColSpan = activeTab === 'signup' ? { base: 12, sm: 6, md: 4 } : { base: 12, sm: 6 };
 
-  async function handleConsultantPostLogin(emp_id: number) {
+  // Helper for toast notifications
+  function showToast({ message, color = 'red', title = '', autoClose = 3500 }: {
+    message: string; color?: string; title?: string; autoClose?: number
+  }) {
+    notifications.show({
+      color,
+      title,
+      message,
+      autoClose,
+      withCloseButton: true,
+    });
+  }
+
+  // Modified handleConsultantPostLogin for sign-in: checks and creates consultant if missing
+  async function handleConsultantPostLogin(emp_id: number, user_id: number) {
     try {
       let consultantData = null;
       try {
         consultantData = await getConsultantByEmpId(emp_id);
       } catch (e: any) {
-        if (
-          e?.response?.data?.error &&
-          e.response.data.error.toLowerCase().includes("no consultant found")
-        ) {
-          await addConsultant({
-            name: "",
-            emp_id: emp_id.toString(),
-            mobile_no: "",
-            email: "",
-            address: "",
-            current_role: ""
-          });
-          window.location.replace('/profile/edit');
-          return;
-        } else {
-          window.location.replace('/dashboard');
-          return;
-        }
+        // Consultant not found: create a minimal one and ask user to complete details
+        await addConsultant({
+          name: "",
+          emp_id: emp_id.toString(),
+          mobile_no: "",
+          email: "",
+          address: "",
+          current_role: "",
+          user_id: user_id,
+        });
+        showToast({
+          message: "Please finish adding your details.",
+          color: "yellow",
+          title: "Complete Profile Required",
+        });
+        window.location.replace('/profile/edit');
+        return;
       }
 
       if (consultantData && consultantData.consultant) {
         if (isConsultantComplete(consultantData.consultant)) {
           window.location.replace('/dashboard');
         } else {
+          showToast({
+            message: "Please finish adding your details.",
+            color: "yellow",
+            title: "Complete Profile Required",
+          });
           window.location.replace('/profile/edit');
         }
       } else {
@@ -105,7 +123,13 @@ export default function AuthPage() {
           mobile_no: "",
           email: "",
           address: "",
-          current_role: ""
+          current_role: "",
+          user_id: user_id,
+        });
+        showToast({
+          message: "Please finish adding your details.",
+          color: "yellow",
+          title: "Complete Profile Required",
         });
         window.location.replace('/profile/edit');
       }
@@ -142,7 +166,7 @@ export default function AuthPage() {
           position: 'relative',
           height: 'calc(100vh - ' + (HEADER_HEIGHT + 60) + 'px)',
           maxHeight: '100%',
-          overflowY: 'auto', // self-contained scroll
+          overflowY: 'auto',
           background: isDark ? theme.colors.dark[6] : theme.white,
           boxSizing: 'border-box',
           display: 'flex',
@@ -218,12 +242,22 @@ export default function AuthPage() {
                       storage.setItem('isLoggedIn', 'true');
                       storage.setItem('employeeId', signinId);
 
-                      await handleConsultantPostLogin(Number(signinId));
+                      // NOTE: Use returned user id for linking consultant
+                      const user_id = res.user?.id;
+                      if (!user_id) {
+                        showToast({ message: 'User information is incomplete. Please contact support.', color: 'red', title: 'Sign In Failed' });
+                        setSigninLoading(false);
+                        return;
+                      }
+
+                      await handleConsultantPostLogin(Number(signinId), user_id);
                     } else {
                       setSigninError(res?.message || 'Invalid credentials');
+                      showToast({ message: res?.message || 'Invalid credentials', color: 'red', title: 'Sign In Failed' });
                     }
                   } catch (err) {
                     setSigninError('Sign in failed. Please try again.');
+                    showToast({ message: 'Sign in failed. Please try again.', color: 'red', title: 'Sign In Failed' });
                   }
                   setSigninLoading(false);
                 }}
@@ -246,15 +280,14 @@ export default function AuthPage() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                setSignupError('');
                 setSignupLoading(true);
                 if (signupPassword !== signupConfirm) {
-                  setSignupError('Passwords do not match');
+                  showToast({ message: 'Passwords do not match', color: 'red', title: 'Sign Up Failed' });
                   setSignupLoading(false);
                   return;
                 }
                 if (!signupId || !signupName || !signupMobile || !signupEmail) {
-                  setSignupError('Please fill in all required fields');
+                  showToast({ message: 'Please fill in all required fields', color: 'red', title: 'Sign Up Failed' });
                   setSignupLoading(false);
                   return;
                 }
@@ -264,12 +297,8 @@ export default function AuthPage() {
                     password: signupPassword,
                     role: 'Consultant'
                   };
-                  console.log('Sending user payload:', userPayload);
-
                   const res = await addUser(userPayload);
-                  console.log('addUser response:', res);
 
-                  // Check for res.user (or res.success)
                   if (res && (res.success || res.user)) {
                     const consultantPayload = {
                       name: signupName,
@@ -278,33 +307,28 @@ export default function AuthPage() {
                       email: signupEmail,
                       address: signupAddress || "",
                       current_role: signupRole || "",
-                      user_id: res.user.id // <--- THIS IS THE FIX
+                      user_id: res.user.id
                     };
-                    console.log('Sending consultant payload:', consultantPayload);
 
                     await addConsultant(consultantPayload)
                       .catch(e => {
-                        console.error('addConsultant failed:', e);
-                        setSignupError('Consultant creation failed: ' + (e?.response?.data?.message || e.message));
+                        showToast({ message: 'Consultant creation failed: ' + (e?.response?.data?.message || e.message), color: 'red', title: 'Sign Up Failed' });
                         throw e;
                       });
                     setActiveTab('signin');
                     setSignupSuccess(true);
+                    showToast({ message: 'Registration successful! Please sign in.', color: 'green', title: 'Sign Up Success' });
                   } else {
-                    setSignupError(res?.message || 'Sign up failed');
+                    showToast({ message: res?.message || 'Sign up failed', color: 'red', title: 'Sign Up Failed' });
                   }
                 } catch (err: any) {
-                  console.error('Sign up error:', err);
-                  setSignupError(err?.response?.data?.message || 'Sign up failed. Please try again.');
+                  showToast({ message: err?.response?.data?.message || 'Sign up failed. Please try again.', color: 'red', title: 'Sign Up Failed' });
                 }
                 setSignupLoading(false);
               }}
             >
               <Stack gap="sm">
                 <Text fw={600} size="lg">Create your account</Text>
-                {signupError && (
-                  <Text c="red" ta="center" fw={500}>{signupError}</Text>
-                )}
                 <Box
                   mb={6}
                   p={{ base: 10, sm: 14 }}

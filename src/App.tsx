@@ -11,6 +11,8 @@ import { TrainingsPage } from './Components/Trainings/TrainingsPage';
 import { MyTrainingsPage } from './Components/Trainings/MyTrainingsPage';
 import ProfileEditPage from './Components/Profile/EditProfile';
 import AttendanceReport from './Components/Attendance/AttendanceReport';
+import { Notifications } from '@mantine/notifications';
+import { MantineProvider } from '@mantine/core';
 import React from 'react';
 
 // Simple auth check (replace with real auth in production)
@@ -27,7 +29,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <>
+    <MantineProvider>
+      <Notifications position="top-right" zIndex={2077} styles={{notification: {maxWidth: '20vw', width:'100%', marginLeft:'1vw'}}} />
       <NavBar />
       <Container size="lg" pt={80}>
         <Routes>
@@ -112,6 +115,6 @@ export default function App() {
           />
         </Routes>
       </Container>
-    </>
+    </MantineProvider>
   );
 }

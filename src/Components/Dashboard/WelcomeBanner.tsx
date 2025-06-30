@@ -6,7 +6,9 @@ import {
   Group,
   Stack,
 } from '@mantine/core';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { getConsultantByEmpId } from '../../api/consultant';
 
 interface WelcomeBannerProps {
   userName: string;
