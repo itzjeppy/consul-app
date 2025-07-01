@@ -95,3 +95,15 @@ export async function getAllConsultantOpportunities() {
     await handleAxiosError(error);
   }
 }
+
+/**
+ * Get consultant opportunities by consultant ID
+ */
+export async function getConsultantOpportunitiesByConsultantId(consultant_id: number) {
+  try {
+    const response = await axios.get(`${BASE_URL}/getOpportunitiesByConsultant/${consultant_id}`);
+    return response.data.opportunities;
+  } catch (error) {
+    await handleAxiosError(error);
+  }
+}

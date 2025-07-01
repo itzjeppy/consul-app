@@ -31,7 +31,6 @@ export default function Dashboard() {
     <ActionItems />
     <StatsCards />
     <WorkflowProgress />
-    <QuickActions />
   </Stack>
 </Paper>
 

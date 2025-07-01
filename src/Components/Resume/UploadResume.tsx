@@ -201,24 +201,15 @@ export default function UploadResumePage() {
           </Button>
         </Group>
 
-        {rawJson && (
-          <Paper shadow="xs" p="sm" withBorder mt="md">
-            <Title order={5} mb={5}>Extracted JSON</Title>
-            <Code block style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: 13, background: "inherit" }}>
-              {JSON.stringify(rawJson, null, 2)}
-            </Code>
-          </Paper>
-        )}
-
         {skills.length > 0 && (
           <Stack gap="sm" mt="lg">
-            <Title order={4}>Extracted Skills</Title>
+            <Title order={2}>Extracted Skills</Title>
             {skills.map((skill, i) => (
               <Group key={skill.technologies_known + i} justify="space-between">
                 <Text>
                   {skill.technologies_known} ({skill.years_of_experience} yrs)
                 </Text>
-                <Rating value={skill.strength_of_skill} readOnly count={10} />
+                <Rating value={skill.strength_of_skill} readOnly count={5} />
               </Group>
             ))}
           </Stack>

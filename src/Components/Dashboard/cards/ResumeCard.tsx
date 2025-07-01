@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   Title,
@@ -11,8 +12,51 @@ import {
 import { IconFile } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  const now = new Date();
+
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return 'Today';
+  } else if (diffDays === 1) {
+    return 'Yesterday';
+  } else if (diffDays < 7) {
+    return date.toLocaleDateString(undefined, { weekday: 'long' });
+  } else {
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+}
+
 export default function ResumeCard() {
   const navigate = useNavigate();
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedDate = localStorage.getItem('last_resume_update');
+    if (storedDate) {
+      setLastUpdate(storedDate);
+    }
+  }, []);
+
+  const handleUpload = () => {
+    const today = new Date().toISOString();
+    localStorage.setItem('last_resume_update', today);
+    setLastUpdate(today);
+    navigate('/upload-resume');
+  };
+
+  const status = lastUpdate ? 'UPDATED' : 'PENDING';
+  const progress = lastUpdate ? 100 : 0;
+  const lastUpdateText = lastUpdate
+    ? `Last updated ${formatDate(lastUpdate)}`
+    : 'You have not uploaded your resume yet';
 
   return (
     <Card withBorder radius="md" shadow="sm" p="md">
@@ -23,7 +67,7 @@ export default function ResumeCard() {
           <div>
             <Title order={5}>Resume Status</Title>
             <Text size="xs" c="gray.6">
-              Last updated 2 weeks ago
+              {lastUpdateText}
             </Text>
           </div>
         </Group>
@@ -32,29 +76,29 @@ export default function ResumeCard() {
         <Group justify="space-between" align="center">
           <Text size="sm">Status</Text>
           <Badge color="blue" variant="filled" size="sm" radius="sm">
-            PENDING
+            {status}
           </Badge>
         </Group>
 
         {/* Progress bar */}
-        <Progress value={40} color="blue" size="sm" radius="xl" />
+        <Progress value={progress} color="blue" size="sm" radius="xl" />
 
-        {/* Filler row */}
+        {/* Spacer row */}
         <Group justify="space-between" mt="xs" c="gray.6" fz="sm">
           <Text size="sm" c="gray.6">
-            ‎ 
+            ‎
           </Text>
         </Group>
 
-        {/* Button with navigation */}
+        {/* Button */}
         <Button
           fullWidth
           color="blue"
           radius="md"
           mt="xs"
-          onClick={() => navigate('/upload-resume')}
+          onClick={handleUpload}
         >
-          Update Resume
+          {lastUpdate ? 'Update Resume' : 'Upload Resume'}
         </Button>
       </Stack>
     </Card>

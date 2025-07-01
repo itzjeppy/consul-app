@@ -87,16 +87,6 @@ export default function NavBar() {
             >
               {colorScheme === 'dark' ? <IconMoon size={18} /> : <IconSun size={18} />}
             </Button>
-
-            {/* Avatar */}
-            <Avatar
-              size={24}
-              radius="xl"
-              src="https://api.dicebear.com/7.x/initials/svg?seed=SJ"
-              alt="Profile"
-              styles={{ root: { backgroundColor: 'white' } }}
-            />
-
             {/* Auth Button */}
             {!isLoggedIn ? (
               <Button

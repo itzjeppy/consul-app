@@ -104,7 +104,7 @@ export default function ProfileEditPage() {
         color: 'green',
       });
       setSaving(false); // Ensure loading state is cleared before navigation
-      navigate('/dashboard');
+      navigate('/profile'); // Navigate to profile page after successful edit
     } catch (e: any) {
       console.error('[ProfileEditPage] Error while editing consultant:', e);
       showNotification({

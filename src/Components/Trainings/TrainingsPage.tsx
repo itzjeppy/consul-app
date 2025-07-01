@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Title,
@@ -20,7 +21,6 @@ import {
   IconPlayerPlay,
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import TrainingCard from './TrainingCard';
 import { getTrainingsByIds, getAllTrainings } from '../../api/training';
 import { addConsultantTraining } from '../../api/ConsultantTrainings';
@@ -34,14 +34,13 @@ export function TrainingsPage() {
   const [loading, setLoading] = useState(true);
   const [recommendedTrainings, setRecommendedTrainings] = useState<any[]>([]);
   const [allTrainings, setAllTrainings] = useState<any[]>([]);
-  const [starting, setStarting] = useState<number | null>(null); // training id being started
+  const [consultantTrainings, setConsultantTrainings] = useState<any[]>([]);
+  const [starting, setStarting] = useState<number | null>(null);
   const [consultantId, setConsultantId] = useState<number | null>(null);
 
-  // Replace with actual emp_id logic (from auth/session)
   const emp_id =
     localStorage.getItem('employeeId') || sessionStorage.getItem('employeeId');
 
-  // On mount, fetch consultant_id using emp_id
   useEffect(() => {
     async function fetchConsultantId() {
       if (!emp_id) {
@@ -50,7 +49,6 @@ export function TrainingsPage() {
       }
       try {
         const data = await getConsultantByEmpId(Number(emp_id));
-        // Assume backend returns { consultant: { id: ..., ... } } or similar
         if (data && data.consultant && data.consultant.id) {
           setConsultantId(data.consultant.id);
         } else if (data && data.id) {
@@ -75,7 +73,22 @@ export function TrainingsPage() {
     fetchConsultantId();
   }, [emp_id]);
 
-  // Helper to normalize backend objects to frontend shape
+  useEffect(() => {
+    async function fetchConsultantTrainings() {
+      if (!consultantId) return;
+      try {
+        const res = await fetch(`http://127.0.0.1:5000/consultantTraining/getConsultantTrainingsByConsultantId/${consultantId}`);
+        const data = await res.json();
+        console.log("Fetched consultant ID:", consultantId);
+        console.log("Fetched consultant trainings:", data.consultant_trainings || []);
+        setConsultantTrainings(data.consultant_trainings || []);
+      } catch {
+        setConsultantTrainings([]);
+      }
+    }
+    fetchConsultantTrainings();
+  }, [consultantId]);
+
   function normalizeTraining(t: any) {
     return {
       id: t.id,
@@ -87,33 +100,30 @@ export function TrainingsPage() {
     };
   }
 
-  // Fetch recommended trainings from agent
   useEffect(() => {
     async function fetchRecommendations() {
       setLoading(true);
       try {
-        // 1. Call LLM agent for recommended training IDs
         const aiRes = await fetch('http://127.0.0.1:5000/api/agent/TrainingsMatcher', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Emp-ID': emp_id ?? '', // fallback for robustness
+            'X-Emp-ID': emp_id ?? '',
           },
           body: JSON.stringify({}),
         });
         const aiData = await aiRes.json();
         const matches: number[] = Array.isArray(aiData.matches) ? aiData.matches : [];
 
-        // 2. Get the training details for the recommended IDs
         let recTrainings: any[] = [];
         if (matches.length > 0) {
           recTrainings = await getTrainingsByIds(matches);
         }
         setRecommendedTrainings(recTrainings.map(normalizeTraining));
 
-        // 3. Fetch all trainings for display below
         const allTrs = await getAllTrainings();
         setAllTrainings((allTrs || []).map(normalizeTraining));
+
       } catch (e: any) {
         showNotification({
           color: 'red',
@@ -127,10 +137,8 @@ export function TrainingsPage() {
     }
 
     fetchRecommendations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [emp_id]);
 
-  // Exclude recommended from "all" for "other trainings"
   const recommendedIds = new Set(recommendedTrainings.map((t) => t.id));
   const otherTrainings = allTrainings.filter((t) => !recommendedIds.has(t.id));
   const filteredTrainings = otherTrainings.filter(
@@ -140,7 +148,6 @@ export function TrainingsPage() {
       (filter === '' || t.level === filter)
   );
 
-  // Handler for "Start Training"
   async function handleStartTraining(training_id: number) {
     if (!consultantId) {
       showNotification({
@@ -157,7 +164,7 @@ export function TrainingsPage() {
         training_id,
         attended_hours: 0,
       });
-      navigate('/mytrainings'); // <-- Navigate after success
+      navigate('/mytrainings');
     } catch (e: any) {
       showNotification({
         color: 'red',
@@ -168,24 +175,45 @@ export function TrainingsPage() {
     setStarting(null);
   }
 
-  // TrainingCard with Start Training button override
+  function isConsultantAttending(trainingId: number): boolean {
+    return consultantTrainings.some(ct => 
+      ct.training_id === trainingId || 
+      ct.trainingId === trainingId || 
+      ct.training?.id === trainingId
+    );
+  }
+
   function TrainingCardWithStart({ training, priority = false }: { training: any; priority?: boolean }) {
+    const isAttending = isConsultantAttending(training.id);
+
     return (
       <TrainingCard
         training={training}
         priority={priority}
         actionButton={
-          <Button
-            leftSection={<IconPlayerPlay size={16} />}
-            variant="filled"
-            color="grape.7"
-            loading={starting === training.id}
-            disabled={starting === training.id}
-            onClick={() => handleStartTraining(training.id)}
-            style={{ alignSelf: 'flex-end', marginTop: 'auto' }}
-          >
-            Start Training
-          </Button>
+          isAttending ? (
+            <Button
+              leftSection={<IconPlayerPlay size={16} />}
+              variant="filled"
+              color="grape.7"
+              onClick={() => navigate('/mytrainings')}
+              style={{ alignSelf: 'flex-end', marginTop: 'auto' }}
+            >
+              Resume Training
+            </Button>
+          ) : (
+            <Button
+              leftSection={<IconPlayerPlay size={16} />}
+              variant="filled"
+              color="grape.7"
+              loading={starting === training.id}
+              disabled={starting === training.id}
+              onClick={() => handleStartTraining(training.id)}
+              style={{ alignSelf: 'flex-end', marginTop: 'auto' }}
+            >
+              Start Training
+            </Button>
+          )
         }
       />
     );
@@ -218,7 +246,6 @@ export function TrainingsPage() {
         <Group justify="center" my={60}><Loader size="xl" /></Group>
       ) : (
         <>
-          {/* Recommended Trainings */}
           <Grid gutter="md" mb="xl">
             {recommendedTrainings.length === 0 ? (
               <Box c="dimmed" p="md" ta="center">
@@ -233,7 +260,6 @@ export function TrainingsPage() {
             )}
           </Grid>
           <Divider mb="lg" />
-          {/* Other Trainings */}
           <Title order={2} mb="lg">Other Trainings</Title>
           <Group mb="md">
             <TextInput

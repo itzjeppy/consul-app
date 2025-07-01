@@ -13,18 +13,19 @@ export async function addConsultant(body: object) {
   return response.data;
 }
 
-export async function editConsultant(consultantId:number,body:object){
-    const response = await axios.put(
+export async function editConsultant(consultantId: number, body: object) {
+  const response = await axios.put(
     `http://127.0.0.1:5000/consultant/updateConsultant/${consultantId}`,
+    body,  // ✅ send the actual fields directly
     {
-      data:body,
       headers: {
         'Content-Type': 'application/json',
       },
     }
   );
-  return response.data
+  return response.data;
 }
+
 
 export async function deleteConsultant(consultantId:number){
     const response = await axios.delete(
