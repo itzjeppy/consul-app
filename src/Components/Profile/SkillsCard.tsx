@@ -88,7 +88,7 @@ export default function SkillsCard() {
                   <Text size="xs" c={labelColor}>{skill.years_of_experience} year{skill.years_of_experience > 1 ? 's' : ''} experience</Text>
                 </Group>
               </Stack>
-              <Rating value={skill.strength_of_skill} readOnly size="md" color="yellow" />
+              <Rating value={skill.strength_of_skill} count={5} readOnly size="md" color="yellow" />
             </Group>
           ))
         )}
