@@ -24,7 +24,9 @@ import {
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { getOpportunitiesByIds, getAllOpportunities } from '../../api/opportunity';
+import { addConsultantOpportunity } from '../../api/consultantOpportunity';
 
 const RECOMMENDED_OPPS_KEY = 'recommended_opportunities';
 const RECOMMENDED_OPPS_TS_KEY = 'recommended_opportunities_timestamp';
@@ -60,6 +62,7 @@ export default function OpportunitiesPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [applyingId, setApplyingId] = useState<number | null>(null);
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [allOpportunities, setAllOpportunities] = useState<any[]>([]);
   const [aiRecommendedIds, setAiRecommendedIds] = useState<number[]>([]);
@@ -82,20 +85,24 @@ export default function OpportunitiesPage() {
       let useCache = false;
       let matches: number[] = [];
 
+      // Check if there are cached opportunities in localStorage and valid timestamp
       if (cachedIdsStr && cachedTsStr) {
         const cachedIds = JSON.parse(cachedIdsStr);
         const cachedTs = parseInt(cachedTsStr, 10);
-        if (Array.isArray(cachedIds) && now - cachedTs < RECOMMENDED_OPPS_TTL_MS) {
+        if (Array.isArray(cachedIds) && cachedIds.length > 0 && now - cachedTs < RECOMMENDED_OPPS_TTL_MS) {
           useCache = true;
           matches = cachedIds;
         }
       }
 
+      // If there are no cached opportunities, call the AI agent API
       if (!useCache && emp_id) {
         matches = await fetchRecommendedOpportunities(emp_id);
-        // Store in localStorage
-        localStorage.setItem(RECOMMENDED_OPPS_KEY, JSON.stringify(matches));
-        localStorage.setItem(RECOMMENDED_OPPS_TS_KEY, now.toString());
+        // Store in localStorage if there are any matches
+        if (matches.length > 0) {
+          localStorage.setItem(RECOMMENDED_OPPS_KEY, JSON.stringify(matches));
+          localStorage.setItem(RECOMMENDED_OPPS_TS_KEY, now.toString());
+        }
       }
 
       setAiRecommendedIds(matches);
@@ -141,6 +148,48 @@ export default function OpportunitiesPage() {
       job.skills_expected.toLowerCase().includes(search.toLowerCase())) &&
     (filter === '' || job.level === filter)
   );
+
+  // Handler for Apply Now button
+  const handleApply = async (opportunityId: number) => {
+    console.log('handleApply CALLED', opportunityId);
+    if (!emp_id) {
+      setError('Employee ID not found.');
+      console.log('NO EMP_ID, returning early');
+      return;
+    }
+    setApplyingId(opportunityId);
+    try {
+      // 1. Get consultant's DB id using emp_id
+      const consultantRes = await axios.get(
+        `http://127.0.0.1:5000/consultant/getConsultantByEmpId/${emp_id}`
+      );
+      const consultant_id = consultantRes.data.consultant?.id;
+      if (!consultant_id) {
+        setError('Consultant not found for this employee ID.');
+        setApplyingId(null);
+        console.log('NO CONSULTANT_ID, returning early');
+        return;
+      }
+  
+      // 2. Use consultant_id for the opportunity application
+      const addResp = await addConsultantOpportunity(
+        consultant_id,
+        opportunityId,
+        'Pending'
+      );
+      console.log('addConsultantOpportunity response:', addResp);
+  
+      // 3. (Optional) Show success message or refresh applications
+      navigate('/applications');
+    } catch (e: any) {
+      setError(
+        e?.response?.data?.error ||
+        e?.message ||
+        'Failed to apply for the opportunity.'
+      );
+    }
+    setApplyingId(null);
+  };
 
   return (
     <Box p="lg">
@@ -325,12 +374,14 @@ export default function OpportunitiesPage() {
                   variant="filled"
                   radius="md"
                   size="md"
+                  loading={applyingId === job.id}
                   style={{
                     fontWeight: 600,
                     color: isDark ? theme.colors.dark[7] : '#222',
                     background: isDark ? theme.colors.yellow[6] : undefined,
                   }}
-                  // onClick={() => ...}
+                  onClick={() => handleApply(job.id)}
+                  disabled={applyingId !== null}
                 >
                   Apply Now
                 </Button>
